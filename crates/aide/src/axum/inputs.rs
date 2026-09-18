@@ -12,8 +12,8 @@ use axum::{
 };
 
 use indexmap::IndexMap;
-use schemars::{json_schema, JsonSchema, Schema};
 use serde_json::json;
+use ts_rs::TS;
 
 use crate::{
     error::Error,
@@ -40,7 +40,6 @@ where
     T: axum_extra::headers::Header,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
-        let s = ctx.schema.subschema_for::<String>();
         add_parameters(
             ctx,
             operation,
@@ -50,11 +49,7 @@ where
                     description: None,
                     required: true,
                     format: crate::openapi::ParameterSchemaOrContent::Schema(
-                        openapi::SchemaObject {
-                            json_schema: s,
-                            example: None,
-                            external_docs: None,
-                        },
+                        SchemaObject::literal("string"),
                     ),
                     extensions: Default::default(),
                     deprecated: None,
@@ -69,29 +64,22 @@ where
 }
 
 #[cfg(any(feature = "axum-json", feature = "axum-extra-json-deserializer"))]
-fn operation_input_json<T: JsonSchema>(
+fn operation_input_json<T: TS + 'static>(
     ctx: &mut crate::generate::GenContext,
     operation: &mut Operation,
 ) {
-    let json_schema = ctx.schema.subschema_for::<T>();
-    let resolved_schema = ctx.resolve_schema(&json_schema);
+    let schema_obj = ctx.register_type::<T>();
+    let description = schema_obj.description.clone();
 
     set_body(
         ctx,
         operation,
         RequestBody {
-            description: resolved_schema
-                .get("description")
-                .and_then(|d| d.as_str())
-                .map(String::from),
+            description,
             content: IndexMap::from_iter([(
                 "application/json".into(),
                 MediaType {
-                    schema: Some(SchemaObject {
-                        json_schema,
-                        example: None,
-                        external_docs: None,
-                    }),
+                    schema: Some(schema_obj),
                     ..Default::default()
                 },
             )]),
@@ -103,13 +91,7 @@ fn operation_input_json<T: JsonSchema>(
 
 #[cfg(any(feature = "axum-json", feature = "axum-extra-json-deserializer"))]
 fn inferred_early_responses_json() -> Vec<(Option<StatusCode>, Response)> {
-    let schema = SchemaObject {
-        json_schema: json_schema!({
-            "type": "string",
-        }),
-        example: None,
-        external_docs: None,
-    };
+    let schema = SchemaObject::literal("string");
 
     let mk = |description: &'static str| Response {
         description: description.into(),
@@ -142,7 +124,7 @@ fn inferred_early_responses_json() -> Vec<(Option<StatusCode>, Response)> {
 #[cfg(feature = "axum-json")]
 impl<T> OperationInput for axum::Json<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         operation_input_json::<T>(ctx, operation);
@@ -159,7 +141,7 @@ where
 #[cfg(feature = "axum-extra-json-deserializer")]
 impl<T> OperationInput for axum_extra::extract::JsonDeserializer<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         operation_input_json::<T>(ctx, operation);
@@ -176,28 +158,21 @@ where
 #[cfg(feature = "axum-form")]
 impl<T> OperationInput for axum::extract::Form<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
-        let schema = ctx.schema.subschema_for::<T>();
-        let resolved_schema = ctx.resolve_schema(&schema);
+        let schema_obj = ctx.register_type::<T>();
+        let description = schema_obj.description.clone();
 
         set_body(
             ctx,
             operation,
             RequestBody {
-                description: resolved_schema
-                    .get("description")
-                    .and_then(|d| d.as_str())
-                    .map(String::from),
+                description,
                 content: IndexMap::from_iter([(
                     "application/x-www-form-urlencoded".into(),
                     MediaType {
-                        schema: Some(SchemaObject {
-                            json_schema: schema.into(),
-                            example: None,
-                            external_docs: None,
-                        }),
+                        schema: Some(schema_obj),
                         ..Default::default()
                     },
                 )]),
@@ -210,11 +185,10 @@ where
 
 impl<T> OperationInput for Path<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
-        let schema = ctx.schema.subschema_for::<T>();
-        let params = parameters_from_schema(ctx, schema, ParamLocation::Path);
+        let params = parameters_from_schema::<T>(ctx, ParamLocation::Path);
         add_parameters(ctx, operation, params);
     }
 }
@@ -222,11 +196,10 @@ where
 #[cfg(feature = "axum-query")]
 impl<T> OperationInput for axum::extract::Query<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
-        let schema = ctx.schema.subschema_for::<T>();
-        let params = parameters_from_schema(ctx, schema, ParamLocation::Query);
+        let params = parameters_from_schema::<T>(ctx, ParamLocation::Query);
         add_parameters(ctx, operation, params);
     }
 }
@@ -256,15 +229,7 @@ impl OperationInput for axum::extract::ws::WebSocketUpgrade {
                             required: false,
                             deprecated: None,
                             format: crate::openapi::ParameterSchemaOrContent::Schema(
-                                SchemaObject {
-                                    json_schema: json_schema!({
-                                        "type": "string",
-                                        "enum": ["upgrade"],
-                                        "const": "upgrade",
-                                    }),
-                                    external_docs: None,
-                                    example: Some(json!("upgrade")),
-                                },
+                                SchemaObject::literal_with_example("string", json!("upgrade")),
                             ),
                             example: None,
                             examples: Default::default(),
@@ -279,15 +244,7 @@ impl OperationInput for axum::extract::ws::WebSocketUpgrade {
                             required: false,
                             deprecated: None,
                             format: crate::openapi::ParameterSchemaOrContent::Schema(
-                                SchemaObject {
-                                    json_schema: json_schema!({
-                                        "type": "string",
-                                        "enum": ["websocket"],
-                                        "const": "websocket",
-                                    }),
-                                    external_docs: None,
-                                    example: Some(json!("websocket")),
-                                },
+                                SchemaObject::literal_with_example("string", json!("websocket")),
                             ),
                             example: None,
                             examples: Default::default(),
@@ -302,13 +259,7 @@ impl OperationInput for axum::extract::ws::WebSocketUpgrade {
                             required: false,
                             deprecated: None,
                             format: crate::openapi::ParameterSchemaOrContent::Schema(
-                                SchemaObject {
-                                    json_schema: json_schema!({
-                                        "type": "string",
-                                    }),
-                                    external_docs: None,
-                                    example: None,
-                                },
+                                SchemaObject::literal("string"),
                             ),
                             example: None,
                             examples: Default::default(),
@@ -323,13 +274,7 @@ impl OperationInput for axum::extract::ws::WebSocketUpgrade {
                             required: false,
                             deprecated: None,
                             format: crate::openapi::ParameterSchemaOrContent::Schema(
-                                SchemaObject {
-                                    json_schema: json_schema!({
-                                        "type": "string",
-                                    }),
-                                    external_docs: None,
-                                    example: None,
-                                },
+                                SchemaObject::literal("string"),
                             ),
                             example: None,
                             examples: Default::default(),
@@ -358,13 +303,7 @@ impl OperationInput for axum::extract::Multipart {
                 content: IndexMap::from_iter([(
                     "multipart/form-data".into(),
                     MediaType {
-                        schema: Some(SchemaObject {
-                            json_schema: json_schema!({
-                                "type": "array",
-                            }),
-                            external_docs: None,
-                            example: None,
-                        }),
+                        schema: Some(SchemaObject::literal("unknown[]")),
                         ..Default::default()
                     },
                 )]),
@@ -410,28 +349,21 @@ impl OperationInput for axum_extra::extract::PrivateCookieJar {}
 #[cfg(feature = "axum-extra-form")]
 impl<T> OperationInput for axum_extra::extract::Form<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
-        let schema = ctx.schema.subschema_for::<T>();
-        let resolved_schema = ctx.resolve_schema(&schema);
+        let schema_obj = ctx.register_type::<T>();
+        let description = schema_obj.description.clone();
 
         set_body(
             ctx,
             operation,
             RequestBody {
-                description: resolved_schema
-                    .get("description")
-                    .and_then(|d| d.as_str())
-                    .map(String::from),
+                description,
                 content: IndexMap::from_iter([(
                     "application/x-www-form-urlencoded".into(),
                     MediaType {
-                        schema: Some(SchemaObject {
-                            json_schema: schema.into(),
-                            example: None,
-                            external_docs: None,
-                        }),
+                        schema: Some(schema_obj),
                         ..Default::default()
                     },
                 )]),
@@ -444,11 +376,10 @@ where
 #[cfg(feature = "axum-extra-query")]
 impl<T> OperationInput for axum_extra::extract::Query<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
-        let schema = ctx.schema.subschema_for::<T>();
-        let params = parameters_from_schema(ctx, schema, ParamLocation::Query);
+        let params = parameters_from_schema::<T>(ctx, ParamLocation::Query);
         add_parameters(ctx, operation, params);
     }
 }

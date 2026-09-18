@@ -1,4 +1,4 @@
-use schemars::JsonSchema;
+use ts_rs::TS;
 
 use crate::{
     openapi::Operation,
@@ -9,11 +9,10 @@ use crate::{
 #[cfg(feature = "axum")]
 impl<T> OperationInput for serde_qs::axum::QsQuery<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
-        let schema = ctx.schema.subschema_for::<T>();
-        let params = parameters_from_schema(ctx, schema, ParamLocation::Query);
+        let params = parameters_from_schema::<T>(ctx, ParamLocation::Query);
         add_parameters(ctx, operation, params);
     }
 }

@@ -1,9 +1,18 @@
 //! # Aide
 //!
-//! `aide` is a code-first [Open API](https://www.openapis.org/) documentation
-//! generator library. It aims for tight integrations with frameworks and
-//! following their conventions, while tries to be out
-//! of the way when it is not needed.
+//! `aide` is a code-first TypeScript API client/type generator library. It
+//! aims for tight integrations with frameworks and following their
+//! conventions, while tries to be out of the way when it is not needed.
+//!
+//! Aide walks the routes registered on a web framework's router and, for each
+//! operation, emits:
+//!
+//! - TypeScript type declarations for every Rust type involved, generated via
+//!   [`ts-rs`](https://docs.rs/ts-rs).
+//! - A small, typed `fetch`-based API client with one function per route.
+//!
+//! This used to generate an [Open API](https://www.openapis.org/) document
+//! instead, see [`typescript`] for the new output format.
 //!
 //! The goal is to minimize the learning curve, mental context switches
 //! and make documentation somewhat slightly less of a chore.
@@ -31,8 +40,8 @@
 //!
 //! ## Type-based Generation
 //!
-//! The library uses [`schemars`] for schema generation for types.
-//! It should be enough to slap [`JsonSchema`](schemars::JsonSchema)
+//! The library uses [`ts-rs`](https://docs.rs/ts-rs) for TypeScript type
+//! generation. It should be enough to slap `#[derive(ts_rs::TS)]`
 //! alongside [serde]'s `Serialize/Deserialize` for JSON-based APIs.
 //!
 //! Additionally the [`OperationInput`] and [`OperationOutput`] traits
@@ -40,8 +49,8 @@
 //! expected HTTP parameter and response documentation.
 //!
 //! For example a `Json<T>` extractor will generate an `application/json`
-//! request body with the schema of `T` if it implements
-//! [`JsonSchema`](schemars::JsonSchema).
+//! request body referencing the TypeScript type of `T` if it implements
+//! [`ts_rs::TS`].
 //!
 //! ## Declarative Documentation
 //!
@@ -140,20 +149,13 @@ pub mod operation;
 
 pub mod openapi;
 pub mod transform;
+pub mod typescript;
 pub mod util;
 
 #[cfg(feature = "axum")]
 pub mod axum;
 
 mod helpers;
-#[cfg(feature = "redoc")]
-pub mod redoc;
-
-#[cfg(feature = "swagger")]
-pub mod swagger;
-
-#[cfg(feature = "scalar")]
-pub mod scalar;
 
 pub use helpers::{
     no_api::NoApi, use_api::IntoApi, use_api::UseApi, with_api::ApiOverride, with_api::WithApi,

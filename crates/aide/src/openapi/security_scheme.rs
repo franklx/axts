@@ -9,7 +9,6 @@ use serde::{Deserialize, Serialize};
 /// Discovery.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type")]
-#[derive(schemars::JsonSchema)]
 pub enum SecurityScheme {
     #[serde(rename = "apiKey")]
     ApiKey {
@@ -65,7 +64,6 @@ pub enum SecurityScheme {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
-#[derive(schemars::JsonSchema)]
 pub enum ApiKeyLocation {
     Query,
     Header,
@@ -74,7 +72,6 @@ pub enum ApiKeyLocation {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-#[derive(schemars::JsonSchema)]
 pub struct OAuth2Flows {
     #[serde(flatten)]
     pub implicit: Option<OAuth2Flow>,
@@ -88,7 +85,6 @@ pub struct OAuth2Flows {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
-#[derive(schemars::JsonSchema)]
 pub enum OAuth2Flow {
     #[serde(rename_all = "camelCase")]
     Implicit {

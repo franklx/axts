@@ -1,11 +1,11 @@
-use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 use uuid::Uuid;
 
 pub mod routes;
 
 /// A single Todo item.
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
 pub struct TodoItem {
     pub id: Uuid,
     /// The description of the item.

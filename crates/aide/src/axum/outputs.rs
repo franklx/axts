@@ -8,9 +8,8 @@ use axum::extract::rejection::FormRejection;
 use axum::extract::rejection::JsonRejection;
 use axum::response::{Html, NoContent, Redirect};
 use indexmap::IndexMap;
-use schemars::json_schema;
 #[cfg(any(feature = "axum-form", feature = "axum-json"))]
-use schemars::JsonSchema;
+use ts_rs::TS;
 
 use crate::{generate::GenContext, operation::OperationOutput};
 
@@ -32,28 +31,19 @@ impl OperationOutput for NoContent {
 #[cfg(feature = "axum-json")]
 impl<T> OperationOutput for axum::Json<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     type Inner = T;
 
     fn operation_response(ctx: &mut GenContext, _operation: &mut Operation) -> Option<Response> {
-        let json_schema = ctx.schema.subschema_for::<T>();
-        let resolved_schema = ctx.resolve_schema(&json_schema);
+        let schema_obj = ctx.register_type::<T>();
 
         Some(Response {
-            description: resolved_schema
-                .get("description")
-                .and_then(|d| d.as_str())
-                .map(String::from)
-                .unwrap_or_default(),
+            description: schema_obj.description.clone().unwrap_or_default(),
             content: IndexMap::from_iter([(
                 "application/json".into(),
                 MediaType {
-                    schema: Some(SchemaObject {
-                        json_schema,
-                        example: None,
-                        external_docs: None,
-                    }),
+                    schema: Some(schema_obj),
                     ..Default::default()
                 },
             )]),
@@ -86,28 +76,19 @@ where
 #[cfg(feature = "axum-form")]
 impl<T> OperationOutput for axum::extract::Form<T>
 where
-    T: JsonSchema,
+    T: TS + 'static,
 {
     type Inner = T;
 
     fn operation_response(ctx: &mut GenContext, _operation: &mut Operation) -> Option<Response> {
-        let json_schema = ctx.schema.subschema_for::<T>();
-        let resolved_schema = ctx.resolve_schema(&json_schema);
+        let schema_obj = ctx.register_type::<T>();
 
         Some(Response {
-            description: resolved_schema
-                .get("description")
-                .and_then(|d| d.as_str())
-                .map(String::from)
-                .unwrap_or_default(),
+            description: schema_obj.description.clone().unwrap_or_default(),
             content: IndexMap::from_iter([(
                 "application/x-www-form-urlencoded".into(),
                 MediaType {
-                    schema: Some(SchemaObject {
-                        json_schema: json_schema.into(),
-                        example: None,
-                        external_docs: None,
-                    }),
+                    schema: Some(schema_obj),
                     ..Default::default()
                 },
             )]),
@@ -146,13 +127,7 @@ impl<T> OperationOutput for Html<T> {
             content: IndexMap::from_iter([(
                 "text/html".into(),
                 MediaType {
-                    schema: Some(SchemaObject {
-                        json_schema: json_schema!({
-                            "type": "string",
-                        }),
-                        example: None,
-                        external_docs: None,
-                    }),
+                    schema: Some(SchemaObject::literal("string")),
                     ..Default::default()
                 },
             )]),
@@ -295,13 +270,7 @@ mod extra {
                                     .to_owned(),
                             ),
                             required: false,
-                            format: ParameterSchemaOrContent::Schema(SchemaObject {
-                                json_schema: json_schema!({
-                                    "type": "string",
-                                }),
-                                example: None,
-                                external_docs: None,
-                            }),
+                            format: ParameterSchemaOrContent::Schema(SchemaObject::literal("string")),
                             extensions: Default::default(),
                             deprecated: None,
                             example: Some(serde_json::json!(r#"attachment; filename="xyz.pdf""#)),
@@ -314,13 +283,7 @@ mod extra {
                         ReferenceOr::Item(Header {
                             description: Some("MIME type of the file".to_owned()),
                             required: false,
-                            format: ParameterSchemaOrContent::Schema(SchemaObject {
-                                json_schema: json_schema!({
-                                    "type": "string",
-                                }),
-                                external_docs: None,
-                                example: None,
-                            }),
+                            format: ParameterSchemaOrContent::Schema(SchemaObject::literal("string")),
                             extensions: Default::default(),
                             deprecated: None,
                             example: Some(serde_json::json!("application/pdf")),

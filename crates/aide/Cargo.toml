@@ -13,7 +13,7 @@ publish = ["elleci"]
 
 [dependencies]
 indexmap = { version = "2", features = ["serde"] }
-schemars = { version = "1", features = ["indexmap2"] }
+ts-rs = { version = "12", features = ["indexmap-impl"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
@@ -34,9 +34,6 @@ axum-login = { registry = "elleci", version = "0.19", optional = true }
 
 [features]
 macros = ["dep:aide-macros"]
-redoc = []
-swagger = []
-scalar = []
 skip_serializing_defaults = []
 serde_qs = ["dep:serde_qs"]
 

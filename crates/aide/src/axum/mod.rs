@@ -46,13 +46,14 @@
 //!     },
 //!     openapi::{Info, OpenApi},
 //! };
+//! use aide::NoApi;
 //! use axum::{Extension, Json};
-//! use schemars::JsonSchema;
 //! use serde::Deserialize;
+//! use ts_rs::TS;
 //!
-//! // We'll need to derive `JsonSchema` for
+//! // We'll need to derive `TS` for
 //! // all types that appear in the api documentation.
-//! #[derive(Deserialize, JsonSchema)]
+//! #[derive(Deserialize, TS)]
 //! struct User {
 //!     name: String,
 //! }
@@ -61,11 +62,11 @@
 //!     format!("hello {}", user.name)
 //! }
 //!
-//! // Note that this clones the document on each request.
-//! // To be more efficient, we could wrap it into an Arc,
-//! // or even store it as a serialized string.
+//! // `OpenApi` itself is just bookkeeping for the routes/types that
+//! // were registered, it does not need to derive `TS`. Wrapping the
+//! // response in `NoApi` lets us return it without that requirement.
 //! async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
-//!     Json(api)
+//!     NoApi(Json(api))
 //! }
 //!
 //! #[tokio::main]
@@ -74,7 +75,7 @@
 //!         // Change `route` to `api_route` for the route
 //!         // we'd like to expose in the documentation.
 //!         .api_route("/hello", post(hello_user))
-//!         // We'll serve our generated document here.
+//!         // We'll serve our generated route manifest here.
 //!         .route("/api.json", get(serve_api));
 //!
 //!     let mut api = OpenApi {
@@ -87,12 +88,18 @@
 //!
 //!     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
 //!
+//!     let app = app.finish_api(&mut api);
+//!
+//!     // Write the `User.ts` (and friends) type declarations to disk...
+//!     aide::generate::export_types("bindings").unwrap();
+//!     // ...and generate a typed `fetch` client for the routes above.
+//!     let client = aide::typescript::to_client(&api, &Default::default());
+//!     std::fs::write("bindings/client.ts", client).unwrap();
+//!
 //!     axum::serve(
 //!         listener,
 //!         app
-//!             // Generate the documentation.
-//!             .finish_api(&mut api)
-//!             // Expose the documentation to the handlers.
+//!             // Expose the route manifest to the handlers.
 //!             .layer(Extension(api))
 //!             .into_make_service(),
 //!     )
@@ -171,8 +178,8 @@
 use std::{convert::Infallible, future::Future, pin::Pin};
 
 use crate::{
-    generate::{self, in_context},
-    openapi::{OpenApi, PathItem, ReferenceOr, SchemaObject},
+    generate::in_context,
+    openapi::{OpenApi, PathItem, ReferenceOr},
     operation::OperationHandler,
     util::{merge_paths, path_for_nested_route},
     OperationInput, OperationOutput,
@@ -441,38 +448,6 @@ where
         );
 
         let _ = transform(TransformOpenApi::new(api));
-
-        let needs_reset = in_context(|ctx| {
-            // Strip null types from query parameters if enabled
-            if ctx.strip_query_null_types {
-                crate::transform::strip_null_from_query_params_impl(api);
-            }
-
-            if !ctx.extract_schemas {
-                return false;
-            }
-
-            let components = api.components.get_or_insert_with(Default::default);
-            components
-                .schemas
-                .extend(ctx.schema.take_definitions(true).into_iter().map(
-                    |(name, json_schema)| {
-                        (
-                            name,
-                            SchemaObject {
-                                json_schema: json_schema.try_into().expect("Invalid schema"),
-                                example: None,
-                                external_docs: None,
-                            },
-                        )
-                    },
-                ));
-
-            true
-        });
-        if needs_reset {
-            generate::reset_context();
-        }
     }
 
     /// Adds documentation to an existing route without changing the route handler.
@@ -902,10 +877,10 @@ mod tests {
     fn inferred_early_responses_for_json_are_documented() {
         use crate::{generate, openapi::Operation, OperationInput};
         use axum::Json;
-        use schemars::JsonSchema;
         use serde::Deserialize;
+        use ts_rs::TS;
 
-        #[derive(Deserialize, JsonSchema)]
+        #[derive(Deserialize, TS)]
         struct Example {
             value: usize,
         }

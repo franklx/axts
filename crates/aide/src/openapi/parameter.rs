@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 /// Describes a single operation parameter.
 ///
 /// A unique parameter is defined by a combination of a name and location.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, schemars::JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ParameterData {
     /// REQUIRED. The name of the parameter. Parameter names are case sensitive.
     /// If in is "path", the name field MUST correspond to the associated path
@@ -50,7 +50,6 @@ pub struct ParameterData {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
-#[derive(schemars::JsonSchema)]
 pub enum ParameterSchemaOrContent {
     /// The schema defining the type used for the parameter.
     Schema(SchemaObject),
@@ -64,7 +63,6 @@ pub type Content = IndexMap<String, MediaType>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "in", rename_all = "camelCase")]
-#[derive(schemars::JsonSchema)]
 pub enum Parameter {
     Query {
         #[serde(flatten)]
@@ -209,7 +207,6 @@ impl SkipSerializeIfDefault {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
-#[derive(schemars::JsonSchema)]
 pub enum PathStyle {
     Matrix,
     Label,
@@ -223,7 +220,6 @@ impl Default for PathStyle {
 }
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
-#[derive(schemars::JsonSchema)]
 pub enum QueryStyle {
     Form,
     SpaceDelimited,
@@ -238,7 +234,6 @@ impl Default for QueryStyle {
 }
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
-#[derive(schemars::JsonSchema)]
 pub enum CookieStyle {
     Form,
 }
@@ -250,7 +245,6 @@ impl Default for CookieStyle {
 }
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
-#[derive(schemars::JsonSchema)]
 pub enum HeaderStyle {
     Simple,
 }

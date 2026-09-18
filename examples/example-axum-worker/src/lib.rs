@@ -35,8 +35,6 @@ async fn fetch(
         println!("{error}");
     });
 
-    aide::generate::extract_schemas(true);
-
     let state = AppState::default();
 
     let mut api = OpenApi::default();

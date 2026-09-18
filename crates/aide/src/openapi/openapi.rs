@@ -4,10 +4,9 @@ use crate::openapi::*;
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, schemars::JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct OpenApi {
     #[serde(with = "serde_version")]
-    #[schemars(with = "&'static str")]
     pub openapi: Cow<'static, str>,
 
     /// REQUIRED. Provides metadata about the API.

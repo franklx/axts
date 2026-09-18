@@ -11,7 +11,7 @@ use axum::{
     response::IntoResponse,
     Json,
 };
-use schemars::JsonSchema;
+use ts_rs::TS;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -37,14 +37,14 @@ pub fn todo_routes(state: AppState) -> ApiRouter {
 }
 
 /// New Todo details.
-#[derive(Deserialize, JsonSchema)]
+#[derive(Deserialize, TS)]
 struct NewTodo {
     /// The description for the new Todo.
     description: String,
 }
 
 /// New Todo details.
-#[derive(Serialize, JsonSchema)]
+#[derive(Serialize, TS)]
 struct TodoCreated {
     /// The ID of the new Todo.
     id: Uuid,
@@ -72,7 +72,7 @@ fn create_todo_docs(op: TransformOperation) -> TransformOperation {
         .response::<201, Json<TodoCreated>>()
 }
 
-#[derive(Serialize, JsonSchema)]
+#[derive(Serialize, TS)]
 struct TodoList {
     todo_ids: Vec<Uuid>,
 }
@@ -87,7 +87,7 @@ fn list_todos_docs(op: TransformOperation) -> TransformOperation {
     op.description("List all Todo items.")
 }
 
-#[derive(Deserialize, JsonSchema)]
+#[derive(Deserialize, TS)]
 struct SelectTodo {
     /// The ID of the Todo.
     id: Uuid,

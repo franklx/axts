@@ -4,7 +4,7 @@ use crate::{openapi::*, util::*};
 use indexmap::IndexMap;
 use serde::{Deserialize, Deserializer, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, schemars::JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct Responses {
     /// The documentation of responses other than the ones declared
     /// for specific HTTP response codes. Use this field to cover
@@ -29,7 +29,7 @@ pub struct Responses {
     pub extensions: IndexMap<String, serde_json::Value>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, schemars::JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct Response {
     /// REQUIRED. A description of the response.
     /// CommonMark syntax MAY be used for rich text representation.

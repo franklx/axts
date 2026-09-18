@@ -1,7 +1,7 @@
 //! Traits and utilities for schema generation for operations (handlers).
 
 use indexmap::IndexMap;
-use schemars::Schema;
+use ts_rs::TS;
 
 use crate::generate::GenContext;
 use crate::openapi::{
@@ -195,151 +195,64 @@ pub enum ParamLocation {
     Cookie,
 }
 
-/// Generate operation parameters from a JSON schema
-/// where the schema is an object, and each
-/// property is a parameter.
+/// Generate a single operation parameter for a type registered via
+/// `ts-rs`.
+///
+/// Unlike a full JSON Schema, `ts-rs` does not expose the individual
+/// fields of a type at runtime, so instead of one OpenAPI-style
+/// `Parameter` per struct field, a single parameter is generated that
+/// references the whole TypeScript type by name. Generated TypeScript
+/// clients take the parameter as a single object (e.g. `params:
+/// PathParams`); path parameter names are resolved at codegen time
+/// from the route's own path template, and query objects are
+/// serialized wholesale.
 #[tracing::instrument(skip_all)]
-pub fn parameters_from_schema(
-    ctx: &mut GenContext,
-    schema: Schema,
-    location: ParamLocation,
-) -> Vec<Parameter> {
-    let schema = ctx.resolve_schema(&schema);
+pub fn parameters_from_schema<T>(ctx: &mut GenContext, location: ParamLocation) -> Vec<Parameter>
+where
+    T: TS + 'static + ?Sized,
+{
+    let schema_obj = ctx.register_type::<T>();
+    let name = match location {
+        ParamLocation::Query => "query",
+        ParamLocation::Path => "path",
+        ParamLocation::Header => "header",
+        ParamLocation::Cookie => "cookie",
+    };
 
-    let mut params = Vec::new();
+    let parameter_data = ParameterData {
+        name: name.to_owned(),
+        description: schema_obj.description.clone(),
+        required: true,
+        format: crate::openapi::ParameterSchemaOrContent::Schema(schema_obj),
+        extensions: Default::default(),
+        deprecated: None,
+        example: None,
+        examples: IndexMap::default(),
+        explode: None,
+    };
 
-    if let Some(obj) = schema.as_object() {
-        for (name, schema) in obj
-            .get("properties")
-            .and_then(|p| p.as_object())
-            .into_iter()
-            .flatten()
-        {
-            let json_schema: Schema = schema
-                .clone()
-                .try_into()
-                .unwrap_or_else(|err| panic!("Failed to convert schema {schema}: {err:?}"));
+    let param = match location {
+        ParamLocation::Query => Parameter::Query {
+            parameter_data,
+            allow_reserved: false,
+            style: QueryStyle::Form,
+            allow_empty_value: None,
+        },
+        ParamLocation::Path => Parameter::Path {
+            parameter_data,
+            style: openapi::PathStyle::Simple,
+        },
+        ParamLocation::Header => Parameter::Header {
+            parameter_data,
+            style: openapi::HeaderStyle::Simple,
+        },
+        ParamLocation::Cookie => Parameter::Cookie {
+            parameter_data,
+            style: openapi::CookieStyle::Form,
+        },
+    };
 
-            match location {
-                ParamLocation::Query => {
-                    params.push(Parameter::Query {
-                        parameter_data: ParameterData {
-                            name: name.clone(),
-                            description: json_schema
-                                .get("description")
-                                .and_then(|d| d.as_str())
-                                .map(String::from),
-                            required: obj
-                                .get("required")
-                                .and_then(|r| r.as_array())
-                                .is_some_and(|r| r.contains(&name.as_str().into())),
-                            format: crate::openapi::ParameterSchemaOrContent::Schema(
-                                openapi::SchemaObject {
-                                    json_schema,
-                                    example: None,
-                                    external_docs: None,
-                                },
-                            ),
-                            extensions: Default::default(),
-                            deprecated: None,
-                            example: None,
-                            examples: IndexMap::default(),
-                            explode: None,
-                        },
-                        allow_reserved: false,
-                        style: QueryStyle::Form,
-                        allow_empty_value: None,
-                    });
-                }
-                ParamLocation::Path => {
-                    params.push(Parameter::Path {
-                        parameter_data: ParameterData {
-                            name: name.clone(),
-                            description: json_schema
-                                .get("description")
-                                .and_then(|d| d.as_str())
-                                .map(String::from),
-                            required: obj
-                                .get("required")
-                                .and_then(|r| r.as_array())
-                                .is_some_and(|r| r.contains(&name.as_str().into())),
-                            format: crate::openapi::ParameterSchemaOrContent::Schema(
-                                openapi::SchemaObject {
-                                    json_schema,
-                                    example: None,
-                                    external_docs: None,
-                                },
-                            ),
-                            extensions: Default::default(),
-                            deprecated: None,
-                            example: None,
-                            examples: IndexMap::default(),
-                            explode: None,
-                        },
-                        style: openapi::PathStyle::Simple,
-                    });
-                }
-                ParamLocation::Header => {
-                    params.push(Parameter::Header {
-                        parameter_data: ParameterData {
-                            name: name.clone(),
-                            description: json_schema
-                                .get("description")
-                                .and_then(|d| d.as_str())
-                                .map(String::from),
-                            required: obj
-                                .get("required")
-                                .and_then(|r| r.as_array())
-                                .is_some_and(|r| r.contains(&name.as_str().into())),
-                            format: crate::openapi::ParameterSchemaOrContent::Schema(
-                                openapi::SchemaObject {
-                                    json_schema,
-                                    example: None,
-                                    external_docs: None,
-                                },
-                            ),
-                            extensions: Default::default(),
-                            deprecated: None,
-                            example: None,
-                            examples: IndexMap::default(),
-                            explode: None,
-                        },
-                        style: openapi::HeaderStyle::Simple,
-                    });
-                }
-                ParamLocation::Cookie => {
-                    params.push(Parameter::Cookie {
-                        parameter_data: ParameterData {
-                            name: name.clone(),
-                            description: json_schema
-                                .get("description")
-                                .and_then(|d| d.as_str())
-                                .map(String::from),
-                            required: obj
-                                .get("required")
-                                .and_then(|r| r.as_array())
-                                .is_some_and(|r| r.contains(&name.as_str().into())),
-                            format: crate::openapi::ParameterSchemaOrContent::Schema(
-                                openapi::SchemaObject {
-                                    json_schema,
-                                    example: None,
-                                    external_docs: None,
-                                },
-                            ),
-                            extensions: Default::default(),
-                            deprecated: None,
-                            example: None,
-                            examples: IndexMap::default(),
-                            explode: None,
-                        },
-                        style: openapi::CookieStyle::Form,
-                    });
-                }
-            }
-        }
-    }
-
-    params
+    vec![param]
 }
 
 /// Set the body of an operation while
@@ -377,7 +290,7 @@ mod tests {
     use crate::openapi::{Operation, Response, StatusCode};
     use crate::{generate, OperationInput, OperationOutput};
     use aide_macros::OperationIo;
-    use schemars::JsonSchema;
+    use ts_rs::TS;
 
     fn assert_default_input_impl<T: OperationInput>(ctx: &mut GenContext) {
         let mut operation = Operation::default();
@@ -512,8 +425,8 @@ mod tests {
         struct OperationInputOutput<T, U>(T, U);
 
         struct OperationInputOutputIfJsonSchema<T, U>(T, U);
-        impl<T: JsonSchema, U: JsonSchema> OperationInput for OperationInputOutputIfJsonSchema<T, U> {}
-        impl<T: JsonSchema, U: JsonSchema> OperationOutput for OperationInputOutputIfJsonSchema<T, U> {
+        impl<T: TS, U: TS> OperationInput for OperationInputOutputIfJsonSchema<T, U> {}
+        impl<T: TS, U: TS> OperationOutput for OperationInputOutputIfJsonSchema<T, U> {
             type Inner = Self;
         }
 

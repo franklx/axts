@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 /// An object representing a Server Variable
 /// for server URL template substitution.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, schemars::JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct ServerVariable {
     /// An enumeration of string values to be
     /// used if the substitution options are from a limited set.

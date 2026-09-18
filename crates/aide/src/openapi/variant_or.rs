@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-#[derive(schemars::JsonSchema)]
 pub enum VariantOrUnknown<T> {
     Item(T),
     Unknown(String),
@@ -10,7 +9,6 @@ pub enum VariantOrUnknown<T> {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-#[derive(schemars::JsonSchema)]
 pub enum VariantOrUnknownOrEmpty<T> {
     Item(T),
     Unknown(String),

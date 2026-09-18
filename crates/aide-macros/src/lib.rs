@@ -60,7 +60,7 @@ struct OperationIoOpts {
 /// struct Json<T>(pub T);
 /// ```
 ///
-/// [`JsonSchema`]: https://docs.rs/schemars/latest/schemars/trait.JsonSchema.html
+/// [`JsonSchema`]: https://docs.rs/ts-rs/latest/ts_rs/trait.TS.html
 /// [`OperationInput`]: https://docs.rs/aide/latest/aide/operation/trait.OperationInput.html
 /// [`OperationOutput`]: https://docs.rs/aide/latest/aide/operation/trait.OperationOutput.html
 #[proc_macro_derive(OperationIo, attributes(aide))]
@@ -92,7 +92,7 @@ pub fn derive_operation_io(ts: TokenStream) -> TokenStream {
 
         for param in generic_params {
             wh.predicates
-                .push(parse_quote!(#param: schemars::JsonSchema));
+                .push(parse_quote!(#param: ts_rs::TS));
         }
     }
 
@@ -191,7 +191,7 @@ pub fn axum_typed_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
         #[derive(
             ::axum_extra::routing::TypedPath,
             ::aide_macros::OperationIo,
-            ::schemars::JsonSchema,
+            ::ts_rs::TS,
             ::serde::Deserialize,
         )]
         #[aide(input_with = "aide::axum::routing::typed::TypedPath<Self>")]
