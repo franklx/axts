@@ -11,7 +11,7 @@ use crate::openapi::{
 use crate::Error;
 
 #[cfg(feature = "macros")]
-pub use aide_macros::OperationIo;
+pub use axts_macros::OperationIo;
 
 /// A trait for operation input schema generation.
 ///
@@ -26,7 +26,7 @@ pub use aide_macros::OperationIo;
 /// the following is enough:
 ///
 /// ```
-/// use aide::OperationInput;
+/// use axts::OperationInput;
 ///
 /// struct MyExtractor;
 ///
@@ -48,7 +48,7 @@ pub trait OperationInput {
     /// entire operation, it's the implementer's responsibility
     /// to detect errors and only modify the operation as much as needed.
     ///
-    /// There are reusable helpers in [`aide::operation`](crate::operation)
+    /// There are reusable helpers in [`axts::operation`](crate::operation)
     /// to help with both boilerplate and error detection.
     fn operation_input(ctx: &mut GenContext, operation: &mut Operation) {}
 
@@ -157,7 +157,7 @@ pub trait OperationOutput {
     /// Note that this function **can be called multiple
     /// times for the same operation** and should be idempotent.
     ///
-    /// There are reusable helpers in [`aide::operation`](crate::operation)
+    /// There are reusable helpers in [`axts::operation`](crate::operation)
     /// to help with both boilerplate and error detection.
     fn operation_response(ctx: &mut GenContext, operation: &mut Operation) -> Option<Response> {
         None
@@ -289,7 +289,7 @@ mod tests {
     use crate::generate::GenContext;
     use crate::openapi::{Operation, Response, StatusCode};
     use crate::{generate, OperationInput, OperationOutput};
-    use aide_macros::OperationIo;
+    use axts_macros::OperationIo;
     use ts_rs::TS;
 
     fn assert_default_input_impl<T: OperationInput>(ctx: &mut GenContext) {
@@ -317,15 +317,15 @@ mod tests {
         #[derive(OperationIo)]
         struct OperationInputOutput;
         #[derive(OperationIo)]
-        #[aide(input, output)]
+        #[axts(input, output)]
         struct OperationInputOutput2;
         #[derive(OperationIo)]
         struct OperationInputOutputGeneric<T>(T);
         #[derive(OperationIo)]
-        #[aide(input)]
+        #[axts(input)]
         struct OperationInput;
         #[derive(OperationIo)]
-        #[aide(output)]
+        #[axts(output)]
         struct OperationOutput;
 
         generate::in_context(|ctx| {
@@ -381,7 +381,7 @@ mod tests {
         }
 
         #[derive(OperationIo)]
-        #[aide(
+        #[axts(
             input_with = "ImplsOperationInput",
             output_with = "ImplsOperationOutput"
         )]
@@ -417,7 +417,7 @@ mod tests {
         // The `input_with`/`output_with` ensures that this test will only compile if
         // the `json_schema` trait bounds are correct.
         #[derive(OperationIo)]
-        #[aide(
+        #[axts(
             input_with = "OperationInputOutputIfJsonSchema<T, U>",
             output_with = "OperationInputOutputIfJsonSchema<T, U>",
             json_schema

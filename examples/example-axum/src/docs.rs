@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::state::AppState;
-use aide::{
+use axts::{
     axum::{
         routing::get_with,
         ApiRouter, IntoApiResponse,
@@ -14,7 +14,7 @@ use axum::{response::Html, Extension, Json};
 pub fn docs_routes(state: AppState) -> ApiRouter {
     // We infer the return types for these routes
     // as an example.
-    aide::generate::infer_responses(true);
+    axts::generate::infer_responses(true);
 
     let router: ApiRouter = ApiRouter::new()
         .api_route_with(
@@ -27,7 +27,7 @@ pub fn docs_routes(state: AppState) -> ApiRouter {
         .api_route_with(
             "/private/api.json",
             get_with(serve_api_manifest, |op| {
-                op.description("A JSON manifest of the routes known to `aide`.")
+                op.description("A JSON manifest of the routes known to `axts`.")
             }),
             |p| p.security_requirement("ApiKey"),
         )
@@ -42,7 +42,7 @@ pub fn docs_routes(state: AppState) -> ApiRouter {
 
     // Afterwards we disable response inference because
     // it might be incorrect for other routes.
-    aide::generate::infer_responses(false);
+    axts::generate::infer_responses(false);
 
     router
 }
@@ -51,9 +51,9 @@ async fn serve_index() -> impl IntoApiResponse {
     Html(
         r#"<!DOCTYPE html>
 <html lang="en">
-  <head><title>Aide Axum example</title></head>
+  <head><title>Axts Axum example</title></head>
   <body>
-    <h1>Aide Axum example</h1>
+    <h1>Axts Axum example</h1>
     <p>
       This example generates TypeScript instead of an Open API UI.
       TypeScript type declarations for every type used by this API are
@@ -70,7 +70,7 @@ async fn serve_index() -> impl IntoApiResponse {
     )
 }
 
-/// A JSON manifest of the routes known to `aide`, including the name of
+/// A JSON manifest of the routes known to `axts`, including the name of
 /// the TypeScript type used for each parameter/request body/response.
 ///
 /// `OpenApi` is just bookkeeping and does not derive `TS` itself, so we
@@ -83,5 +83,5 @@ async fn serve_api_manifest(Extension(api): Extension<Arc<OpenApi>>) -> impl Int
 /// Serves the same generated TypeScript client that is written to
 /// `bindings/client.ts` on startup.
 async fn serve_client(Extension(api): Extension<Arc<OpenApi>>) -> impl IntoApiResponse {
-    aide::typescript::to_client(&api, &Default::default())
+    axts::typescript::to_client(&api, &Default::default())
 }

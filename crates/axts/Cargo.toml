@@ -1,11 +1,11 @@
 [package]
-name = "aide"
-version = "0.16.0+frk.10"
-authors = ["tamasfe"]
+name = "axts"
+version = "0.16.0"
+authors = ["franklx"]
 edition = "2024"
 keywords = ["generate", "api", "openapi", "documentation", "specification"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/tamasfe/aide"
+repository = "https://github.com/franklx/axts"
 description = "A code-first API documentation library"
 readme = "README.md"
 
@@ -18,7 +18,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
 tracing = "0.1"
-aide-macros = { registry = "elleci", version = "~0.16.0", path = "../aide-macros", optional = true }
+axts-macros = { registry = "elleci", version = "~0.16.0", path = "../axts-macros", optional = true }
 
 bytes = { version = "1", optional = true }
 http = { version = "1", optional = true }
@@ -33,7 +33,7 @@ cfg-if = "1"
 axum-login = { registry = "elleci", version = "0.19", optional = true }
 
 [features]
-macros = ["dep:aide-macros"]
+macros = ["dep:axts-macros"]
 skip_serializing_defaults = []
 serde_qs = ["dep:serde_qs"]
 
@@ -60,7 +60,7 @@ axum-extra-routing = ["axum-extra", "axum-extra/routing"]
 axum-extra-typed-routing = [
     "axum-extra-routing",
     "axum-extra/typed-routing",
-    "aide-macros?/axum-extra-typed-routing",
+    "axts-macros?/axum-extra-typed-routing",
 ]
 axum-extra-with-rejection = ["axum-extra", "axum-extra/with-rejection"]
 

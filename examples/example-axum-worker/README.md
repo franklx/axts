@@ -1,5 +1,5 @@
-# Aide axum
+# Axts axum
 
-A minimal to-do axum cloudflare worker documented with aide.
+A minimal to-do axum cloudflare worker documented with axts.
 
 You can run it with `npm run dev`, and then visit the documentation at `http://localhost:3000`.

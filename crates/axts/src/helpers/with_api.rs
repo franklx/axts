@@ -15,7 +15,7 @@ use crate::{OperationInput, OperationOutput};
 ///
 /// 1. Simple Type override for concrete types
 /// ```
-/// # use aide::{ApiOverride, OperationInput, WithApi};
+/// # use axts::{ApiOverride, OperationInput, WithApi};
 /// # #[derive(Eq, PartialEq, Debug)] struct SomeType;
 ///
 /// #[derive(Debug)]
@@ -39,7 +39,7 @@ use crate::{OperationInput, OperationOutput};
 /// 2. Generic Type Override
 /// ```
 /// # use std::marker::PhantomData;
-/// # use aide::{ApiOverride, OperationInput, WithApi};
+/// # use axts::{ApiOverride, OperationInput, WithApi};
 /// # #[derive(Eq, PartialEq, Debug)] struct SomeType;
 /// # #[derive(Eq, PartialEq, Debug)] struct CustomXML<T>(T);
 ///
@@ -65,7 +65,7 @@ pub trait ApiOverride {
     type Target;
 }
 
-/// Allows non [`OperationInput`] or [`OperationOutput`] types to be used in aide handlers with a provided documentation.
+/// Allows non [`OperationInput`] or [`OperationOutput`] types to be used in axts handlers with a provided documentation.
 ///
 /// For types that already implement [`OperationInput`] or [`OperationOutput`] it overrides the documentation with the provided one.
 /// See [`ApiOverride`] on how to implement such an override

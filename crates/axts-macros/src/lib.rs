@@ -6,7 +6,7 @@ use syn::{parse_macro_input, parse_quote, DeriveInput, Type};
 extern crate proc_macro;
 
 #[derive(Default, FromDeriveInput)]
-#[darling(default, attributes(aide))]
+#[darling(default, attributes(axts))]
 struct OperationIoOpts {
     input: bool,
     input_with: Option<Type>,
@@ -25,8 +25,8 @@ struct OperationIoOpts {
 /// handlers but does not modify the documentation generation in any way.
 ///
 /// ```ignore
-/// use aide::{OperationInput, OperationOutput};
-/// # use aide_macros::{OperationInput, OperationOutput};
+/// use axts::{OperationInput, OperationOutput};
+/// # use axts_macros::{OperationInput, OperationOutput};
 ///
 /// #[derive(OperationIo)]
 /// struct MyExtractor;
@@ -39,7 +39,7 @@ struct OperationIoOpts {
 ///
 /// ```ignore
 /// #[derive(OperationIo)]
-/// #[aide(output)]
+/// #[axts(output)]
 /// struct MyExtractor;
 /// ```
 ///
@@ -52,7 +52,7 @@ struct OperationIoOpts {
 ///
 /// ```ignore
 /// #[derive(OperationIo)]
-/// #[aide(
+/// #[axts(
 ///     input_with = "some_other::Json<T>",
 ///     output_with = "some_other::Json<T>",
 ///     json_schema
@@ -61,9 +61,9 @@ struct OperationIoOpts {
 /// ```
 ///
 /// [`JsonSchema`]: https://docs.rs/ts-rs/latest/ts_rs/trait.TS.html
-/// [`OperationInput`]: https://docs.rs/aide/latest/aide/operation/trait.OperationInput.html
-/// [`OperationOutput`]: https://docs.rs/aide/latest/aide/operation/trait.OperationOutput.html
-#[proc_macro_derive(OperationIo, attributes(aide))]
+/// [`OperationInput`]: https://docs.rs/axts/latest/axts/operation/trait.OperationInput.html
+/// [`OperationOutput`]: https://docs.rs/axts/latest/axts/operation/trait.OperationOutput.html
+#[proc_macro_derive(OperationIo, attributes(axts))]
 pub fn derive_operation_io(ts: TokenStream) -> TokenStream {
     let mut derive_input = parse_macro_input!(ts as DeriveInput);
 
@@ -102,20 +102,20 @@ pub fn derive_operation_io(ts: TokenStream) -> TokenStream {
 
     if !input && !output && input_with.is_none() && output_with.is_none() {
         ts.extend(quote! {
-            impl #i_gen aide::OperationInput for #name #t_gen #w_gen {}
-            impl #i_gen aide::OperationOutput for #name #t_gen #w_gen {
+            impl #i_gen axts::OperationInput for #name #t_gen #w_gen {}
+            impl #i_gen axts::OperationOutput for #name #t_gen #w_gen {
                 type Inner = Self;
             }
         });
     } else {
         if input {
             ts.extend(quote! {
-                impl #i_gen aide::OperationInput for #name #t_gen #w_gen {}
+                impl #i_gen axts::OperationInput for #name #t_gen #w_gen {}
             });
         }
         if output {
             ts.extend(quote! {
-                impl #i_gen aide::OperationOutput for #name #t_gen #w_gen {
+                impl #i_gen axts::OperationOutput for #name #t_gen #w_gen {
                     type Inner = Self;
                 }
             });
@@ -123,22 +123,22 @@ pub fn derive_operation_io(ts: TokenStream) -> TokenStream {
 
         if let Some(input) = input_with {
             ts.extend(quote! {
-                impl #i_gen aide::OperationInput for #name #t_gen #w_gen {
+                impl #i_gen axts::OperationInput for #name #t_gen #w_gen {
                     fn operation_input(
-                        ctx: &mut aide::generate::GenContext,
-                        operation: &mut aide::openapi::Operation
+                        ctx: &mut axts::generate::GenContext,
+                        operation: &mut axts::openapi::Operation
                     ) {
-                        <#input as aide::OperationInput>::operation_input(
+                        <#input as axts::OperationInput>::operation_input(
                             ctx,
                             operation
                         );
                     }
 
                     fn inferred_early_responses(
-                        ctx: &mut aide::generate::GenContext,
-                        operation: &mut aide::openapi::Operation
-                    ) -> Vec<(Option<aide::openapi::StatusCode>, aide::openapi::Response)> {
-                        <#input as aide::OperationInput>::inferred_early_responses(
+                        ctx: &mut axts::generate::GenContext,
+                        operation: &mut axts::openapi::Operation
+                    ) -> Vec<(Option<axts::openapi::StatusCode>, axts::openapi::Response)> {
+                        <#input as axts::OperationInput>::inferred_early_responses(
                             ctx,
                             operation
                         )
@@ -149,22 +149,22 @@ pub fn derive_operation_io(ts: TokenStream) -> TokenStream {
 
         if let Some(output) = output_with {
             ts.extend(quote! {
-                impl #i_gen aide::OperationOutput for #name #t_gen #w_gen {
-                    type Inner = <#output as aide::OperationOutput>::Inner;
+                impl #i_gen axts::OperationOutput for #name #t_gen #w_gen {
+                    type Inner = <#output as axts::OperationOutput>::Inner;
                     fn operation_response(
-                        ctx: &mut aide::generate::GenContext,
-                        operation: &mut aide::openapi::Operation
-                    ) -> Option<aide::openapi::Response> {
-                        <#output as aide::OperationOutput>::operation_response(
+                        ctx: &mut axts::generate::GenContext,
+                        operation: &mut axts::openapi::Operation
+                    ) -> Option<axts::openapi::Response> {
+                        <#output as axts::OperationOutput>::operation_response(
                             ctx,
                             operation
                         )
                     }
                     fn inferred_responses(
-                        ctx: &mut aide::generate::GenContext,
-                        operation: &mut aide::openapi::Operation
-                    ) -> Vec<(Option<aide::openapi::StatusCode>, aide::openapi::Response)> {
-                        <#output as aide::OperationOutput>::inferred_responses(
+                        ctx: &mut axts::generate::GenContext,
+                        operation: &mut axts::openapi::Operation
+                    ) -> Vec<(Option<axts::openapi::StatusCode>, axts::openapi::Response)> {
+                        <#output as axts::OperationOutput>::inferred_responses(
                             ctx,
                             operation
                         )
@@ -179,7 +179,7 @@ pub fn derive_operation_io(ts: TokenStream) -> TokenStream {
 
 /// Example usage:
 /// ```ignore
-/// #[aide::axum::typed_path]
+/// #[axts::axum::typed_path]
 /// #[typed_path("/foo/bar")]
 /// struct FooBar;
 /// ```
@@ -190,11 +190,11 @@ pub fn axum_typed_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
     quote! {
         #[derive(
             ::axum_extra::routing::TypedPath,
-            ::aide_macros::OperationIo,
+            ::axts_macros::OperationIo,
             ::ts_rs::TS,
             ::serde::Deserialize,
         )]
-        #[aide(input_with = "aide::axum::routing::typed::TypedPath<Self>")]
+        #[axts(input_with = "axts::axum::routing::typed::TypedPath<Self>")]
         #input
     }
     .into()

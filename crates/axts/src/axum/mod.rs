@@ -10,7 +10,7 @@
 //!
 //! # Examples
 //!
-//! Take the following `axum` example (requires aide's `axum-json` feature):
+//! Take the following `axum` example (requires axts's `axum-json` feature):
 //!
 //! ```no_run
 //! use axum::{response::IntoResponse, routing::post, Json, Router};
@@ -38,15 +38,15 @@
 //! We can apply the following changes to generate documentation for it:
 //!
 //! ```no_run
-//! // Replace some of the `axum::` types with `aide::axum::` ones.
-//! use aide::{
+//! // Replace some of the `axum::` types with `axts::axum::` ones.
+//! use axts::{
 //!     axum::{
 //!         routing::{get, post},
 //!         ApiRouter, IntoApiResponse,
 //!     },
 //!     openapi::{Info, OpenApi},
 //! };
-//! use aide::NoApi;
+//! use axts::NoApi;
 //! use axum::{Extension, Json};
 //! use serde::Deserialize;
 //! use ts_rs::TS;
@@ -91,9 +91,9 @@
 //!     let app = app.finish_api(&mut api);
 //!
 //!     // Write the `User.ts` (and friends) type declarations to disk...
-//!     aide::generate::export_types("bindings").unwrap();
+//!     axts::generate::export_types("bindings").unwrap();
 //!     // ...and generate a typed `fetch` client for the routes above.
-//!     let client = aide::typescript::to_client(&api, &Default::default());
+//!     let client = axts::typescript::to_client(&api, &Default::default());
 //!     std::fs::write("bindings/client.ts", client).unwrap();
 //!
 //!     axum::serve(
@@ -211,7 +211,7 @@ mod outputs;
 pub mod routing;
 
 #[cfg(all(feature = "macros", feature = "axum-extra-typed-routing"))]
-pub use aide_macros::axum_typed_path as typed_path;
+pub use axts_macros::axum_typed_path as typed_path;
 
 /// A wrapper over [`axum::Router`] that adds
 /// API documentation-specific features.

@@ -8,15 +8,15 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-aide = { path = "../../crates/aide", features = [
+axts = { path = "../../crates/axts", features = [
     "axum-json",
     "macros",
 ] }
-tower-service = "0.3.2"
-worker = { version = "0.5.0", features = ["http", "axum"] }
-console_error_panic_hook = "0.1.7"
-axum = { version = "0.8.1", default-features = false, features = ["macros", "form", "matched-path", "query", "original-uri"] }
+tower-service = "0.3"
+worker = { version = "0.8", features = ["http", "axum"] }
+console_error_panic_hook = "0.1"
+axum = { version = "0.8", default-features = false, features = ["macros", "form", "matched-path", "query", "original-uri"] }
 ts-rs = { version = "12", features = ["uuid-impl", "serde-json-impl"] }
-serde = { version = "1.0.144", features = ["derive", "rc"] }
-serde_json = "1.0.85"
-uuid = { version = "1.1.2", features = ["serde", "v4"] }
+serde = { version = "1", features = ["derive", "rc"] }
+serde_json = "1"
+uuid = { version = "1", features = ["serde", "v4"] }

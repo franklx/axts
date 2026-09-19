@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use aide::{
+use axts::{
     axum::ApiRouter,
     openapi::{OpenApi, Tag},
     transform::TransformOpenApi,
@@ -20,7 +20,7 @@ pub mod todos;
 
 #[tokio::main]
 async fn main() {
-    aide::generate::on_error(|error| {
+    axts::generate::on_error(|error| {
         println!("{error}");
     });
 
@@ -35,16 +35,16 @@ async fn main() {
         .layer(Extension(Arc::new(api.clone()))) // Arc is very important here or you will face massive memory and performance issues
         .with_state(state);
 
-    // Instead of an Open API document, aide now generates TypeScript
+    // Instead of an Open API document, axts now generates TypeScript
     // types (via `ts-rs`) and a typed `fetch` client for the routes
     // above.
-    if let Err(err) = aide::generate::export_types("bindings") {
+    if let Err(err) = axts::generate::export_types("bindings") {
         eprintln!("failed to export TypeScript types: {err}");
     } else {
         println!("TypeScript types written to ./bindings");
     }
 
-    let client = aide::typescript::to_client(&api, &Default::default());
+    let client = axts::typescript::to_client(&api, &Default::default());
     if let Err(err) = std::fs::write("bindings/client.ts", client) {
         eprintln!("failed to write generated TypeScript client: {err}");
     } else {
@@ -59,7 +59,7 @@ async fn main() {
 }
 
 fn api_docs(api: TransformOpenApi) -> TransformOpenApi {
-    api.title("Aide axum Open API")
+    api.title("Axts axum Open API")
         .summary("An example Todo application")
         .description(include_str!("README.md"))
         .tag(Tag {
@@ -69,8 +69,8 @@ fn api_docs(api: TransformOpenApi) -> TransformOpenApi {
         })
         .security_scheme(
             "ApiKey",
-            aide::openapi::SecurityScheme::ApiKey {
-                location: aide::openapi::ApiKeyLocation::Header,
+            axts::openapi::SecurityScheme::ApiKey {
+                location: axts::openapi::ApiKeyLocation::Header,
                 name: "X-Auth-Key".into(),
                 description: Some("A key that is ignored.".into()),
                 extensions: Default::default(),

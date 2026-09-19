@@ -1,0 +1,21 @@
+[package]
+name = "axts-macros"
+version = "0.16.0" # remember to update the dependency in axts, even for patch releases
+authors = ["franklx"]
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "Macros for the Axts library"
+
+publish = ["elleci"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+darling = "0.24"
+quote = "1"
+syn = "3"
+proc-macro2 = "1"
+
+[features]
+axum-extra-typed-routing = []

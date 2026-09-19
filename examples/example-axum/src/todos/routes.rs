@@ -1,4 +1,4 @@
-use aide::{
+use axts::{
     axum::{
         routing::{get_with, post_with, put_with},
         ApiRouter, IntoApiResponse,

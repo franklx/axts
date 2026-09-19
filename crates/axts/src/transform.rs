@@ -28,7 +28,7 @@
 //! ## Example
 //!
 //! ```rust
-//! # use aide::transform::TransformOperation;
+//! # use axts::transform::TransformOperation;
 //! /// This transform function simply adds a no-content response as an example.
 //! fn no_content(op: TransformOperation) -> TransformOperation {
 //!     op.response::<204, ()>()
@@ -38,7 +38,7 @@
 //! The above then can be (re)used using `with`.
 //!
 //! ```
-//! # use aide::transform::TransformOperation;
+//! # use axts::transform::TransformOperation;
 //! # fn no_content(op: TransformOperation) -> TransformOperation {
 //!     op.description("this operation always returns nothing")
 //!         .with(no_content)

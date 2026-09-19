@@ -1,26 +1,26 @@
-- [Aide](#aide)
+- [Axts](#axts)
   - [Community Projects](#community-projects)
   - [Contributing](#contributing)
   - [License](#license)
   - [Similar Libraries](#similar-libraries)
 
-# Aide
+# Axts
 
-[![https://img.shields.io/crates/v/aide](https://img.shields.io/crates/v/aide)](https://crates.io/crates/aide) [![https://img.shields.io/docsrs/aide](https://img.shields.io/docsrs/aide)](https://docs.rs/aide/latest/aide/)
+[![https://img.shields.io/crates/v/axts](https://img.shields.io/crates/v/axts)](https://crates.io/crates/axts) [![https://img.shields.io/docsrs/axts](https://img.shields.io/docsrs/axts)](https://docs.rs/axts/latest/axts/)
 
 A code-first API documentation and other utility libraries for Rust.
 
-Read the [docs](https://docs.rs/aide/latest/aide/).
+Read the [docs](https://docs.rs/axts/latest/axts/).
 
 ## Community Projects
 
 If your project isn't listed here and you would like it to be, please feel free to create a PR.
 
-### Community maintained aide ecosystem
+### Community maintained axts ecosystem
 
-- [aide-axum-typed-multipart-2](https://crates.io/crates/aide-axum-typed-multipart-2): Wrapper around [`axum_typed_multipart`](https://docs.rs/axum_typed_multipart/0.11.0/axum_typed_multipart/)
+- [axts-axum-typed-multipart-2](https://crates.io/crates/axts-axum-typed-multipart-2): Wrapper around [`axum_typed_multipart`](https://docs.rs/axum_typed_multipart/0.11.0/axum_typed_multipart/)
 to generate documentation for multipart requests.
-- [rovo](https://github.com/Arthurdw/rovo): Doc-comment-driven OpenAPI documentation generation for Axum web applications, built on top of aide.
+- [rovo](https://github.com/Arthurdw/rovo): Doc-comment-driven OpenAPI documentation generation for Axum web applications, built on top of axts.
 
 ## Contributing
 
@@ -32,7 +32,7 @@ All code in this repository is dual licensed under [MIT](./LICENSE-MIT) and [Apa
 
 ## Similar Libraries
 
-If Aide is not exactly what you are looking for, make sure to take a look at the alternatives:
+If Axts is not exactly what you are looking for, make sure to take a look at the alternatives:
 
 - [paperclip](https://crates.io/crates/paperclip)
 - [utoipa](https://github.com/juhaku/utoipa)

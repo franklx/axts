@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use aide::{
+use axts::{
     axum::ApiRouter,
     openapi::{OpenApi, Tag},
     transform::TransformOpenApi,
@@ -31,7 +31,7 @@ async fn fetch(
     _ctx: Context,
 ) -> worker::Result<http::Response<axum::body::Body>> {
     console_error_panic_hook::set_once();
-    aide::generate::on_error(|error| {
+    axts::generate::on_error(|error| {
         println!("{error}");
     });
 
@@ -50,7 +50,7 @@ async fn fetch(
 }
 
 fn api_docs(api: TransformOpenApi) -> TransformOpenApi {
-    api.title("Aide axum Open API")
+    api.title("Axts axum Open API")
         .summary("An example Todo application")
         .description(include_str!("README.md"))
         .tag(Tag {
@@ -60,8 +60,8 @@ fn api_docs(api: TransformOpenApi) -> TransformOpenApi {
         })
         .security_scheme(
             "ApiKey",
-            aide::openapi::SecurityScheme::ApiKey {
-                location: aide::openapi::ApiKeyLocation::Header,
+            axts::openapi::SecurityScheme::ApiKey {
+                location: axts::openapi::ApiKeyLocation::Header,
                 name: "X-Auth-Key".into(),
                 description: Some("A key that is ignored.".into()),
                 extensions: Default::default(),

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{OperationInput, OperationOutput};
 
-/// Allows non [`OperationInput`] or [`OperationOutput`] types to be used in aide handlers with a default empty documentation.
+/// Allows non [`OperationInput`] or [`OperationOutput`] types to be used in axts handlers with a default empty documentation.
 ///
 /// For types that already implement [`OperationInput`] or [`OperationOutput`] it overrides the documentation and hides it.
 /// ```ignore

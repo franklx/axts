@@ -1,10 +1,10 @@
-//! # Aide
+//! # Axts
 //!
-//! `aide` is a code-first TypeScript API client/type generator library. It
+//! `axts` is a code-first TypeScript API client/type generator library. It
 //! aims for tight integrations with frameworks and following their
 //! conventions, while tries to be out of the way when it is not needed.
 //!
-//! Aide walks the routes registered on a web framework's router and, for each
+//! Axts walks the routes registered on a web framework's router and, for each
 //! operation, emits:
 //!
 //! - TypeScript type declarations for every Rust type involved, generated via
@@ -17,17 +17,17 @@
 //! The goal is to minimize the learning curve, mental context switches
 //! and make documentation somewhat slightly less of a chore.
 //!
-//! See the [examples](https://github.com/tamasfe/aide/tree/master/examples)
-//! to see how Aide is used with various frameworks.
+//! See the [examples](https://github.com/franklx/axts/tree/master/examples)
+//! to see how Axts is used with various frameworks.
 //!
 //! Currently only Open API version `3.1.x` is supported.
 //!
-//! Previous releases of aide relied heavily on macros, and the
+//! Previous releases of axts relied heavily on macros, and the
 //! [`linkme`](https://docs.rs/linkme/latest/linkme/) crate for automagic global state.
 //! While it all worked, macros were hard to reason about,
 //! rustfmt did not work with them, code completion was hit-and-miss.
 //!
-//! With `0.5.0`, aide was rewritten and instead it is based on on good old functions,
+//! With `0.5.0`, axts was rewritten and instead it is based on on good old functions,
 //! type inference and declarative APIs based on the builder pattern.
 //!
 //! Now all documentation can be traced in the source code[^1],
@@ -59,7 +59,7 @@
 //!
 //! ## Supported Frameworks
 //!
-//! - [axum](https://docs.rs/axum/latest/axum/): [`aide::axum`](axum).
+//! - [axum](https://docs.rs/axum/latest/axum/): [`axts::axum`](axum).
 //! - [actix-web](https://docs.rs/actix-web/latest/actix_web/) is **not
 //!   supported** since `0.5.0` only due to lack of developer capacity,
 //!   but it's likely to be supported again in the future. If you use
@@ -73,7 +73,7 @@
 //!
 //! By default no action is taken on errors, in order to handle them
 //! it is possible to register an error handler in the thread-local context
-//! with [`aide::generate::on_error`](crate::generate::on_error).
+//! with [`axts::generate::on_error`](crate::generate::on_error).
 //!
 //! False positives are chosen over silently swallowing potential
 //! errors, these might happen when there is not enough contextual
@@ -135,9 +135,9 @@
 )]
 
 // Required for using macros such as the `OperationIo` derive macro in tests.
-// These macros use paths starting with `aide::` which would otherwise be invalid within this crate.
+// These macros use paths starting with `axts::` which would otherwise be invalid within this crate.
 #[cfg(test)]
-extern crate self as aide;
+extern crate self as axts;
 
 #[macro_use]
 mod macros;
@@ -165,4 +165,4 @@ pub use error::Error;
 pub use operation::{OperationInput, OperationOutput};
 
 #[cfg(feature = "macros")]
-pub use aide_macros::OperationIo;
+pub use axts_macros::OperationIo;
