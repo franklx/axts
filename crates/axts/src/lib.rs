@@ -41,7 +41,7 @@
 //! ## Type-based Generation
 //!
 //! The library uses [`ts-rs`](https://docs.rs/ts-rs) for TypeScript type
-//! generation. It should be enough to slap `#[derive(ts_rs::TS)]`
+//! generation. It should be enough to slap `#[derive(specta::Type)]`
 //! alongside [serde]'s `Serialize/Deserialize` for JSON-based APIs.
 //!
 //! Additionally the [`OperationInput`] and [`OperationOutput`] traits
@@ -50,7 +50,7 @@
 //!
 //! For example a `Json<T>` extractor will generate an `application/json`
 //! request body referencing the TypeScript type of `T` if it implements
-//! [`ts_rs::TS`].
+//! [`specta::Type`].
 //!
 //! ## Declarative Documentation
 //!

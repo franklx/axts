@@ -4,7 +4,6 @@ use axum::extract::rejection::PathRejection;
 use axum_extra::routing::SecondElementIs;
 use http::request::Parts;
 use serde::de::DeserializeOwned;
-use ts_rs::TS;
 
 use super::*;
 use crate::operation::{add_parameters, parameters_from_schema, OperationHandler, ParamLocation};
@@ -23,7 +22,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
     {
         self.api_route(P::PATH, crate::axum::routing::get(handler))
     }
@@ -40,7 +39,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
         F: FnOnce(TransformOperation<'_>) -> TransformOperation<'_>,
     {
         self.api_route(P::PATH, crate::axum::routing::get_with(handler, transform))
@@ -56,7 +55,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
     {
         self.api_route(P::PATH, crate::axum::routing::delete(handler))
     }
@@ -73,7 +72,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
         F: FnOnce(TransformOperation<'_>) -> TransformOperation<'_>,
     {
         self.api_route(
@@ -92,7 +91,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
     {
         self.api_route(P::PATH, crate::axum::routing::head(handler))
     }
@@ -109,7 +108,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
         F: FnOnce(TransformOperation<'_>) -> TransformOperation<'_>,
     {
         self.api_route(P::PATH, crate::axum::routing::head_with(handler, transform))
@@ -125,7 +124,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
     {
         self.api_route(P::PATH, crate::axum::routing::options(handler))
     }
@@ -142,7 +141,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
         F: FnOnce(TransformOperation<'_>) -> TransformOperation<'_>,
     {
         self.api_route(
@@ -161,7 +160,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
     {
         self.api_route(P::PATH, crate::axum::routing::patch(handler))
     }
@@ -178,7 +177,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
         F: FnOnce(TransformOperation<'_>) -> TransformOperation<'_>,
     {
         self.api_route(
@@ -197,7 +196,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
     {
         self.api_route(P::PATH, crate::axum::routing::post(handler))
     }
@@ -214,7 +213,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
         F: FnOnce(TransformOperation<'_>) -> TransformOperation<'_>,
     {
         self.api_route(P::PATH, crate::axum::routing::post_with(handler, transform))
@@ -230,7 +229,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
     {
         self.api_route(P::PATH, crate::axum::routing::put(handler))
     }
@@ -247,7 +246,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
         F: FnOnce(TransformOperation<'_>) -> TransformOperation<'_>,
     {
         self.api_route(P::PATH, crate::axum::routing::put_with(handler, transform))
@@ -263,7 +262,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
     {
         self.api_route(P::PATH, crate::axum::routing::trace(handler))
     }
@@ -280,7 +279,7 @@ where
         T: SecondElementIs<P> + 'static,
         I: OperationInput,
         O: OperationOutput,
-        P: axum_extra::routing::TypedPath + ts_rs::TS + 'static + OperationInput,
+        P: axum_extra::routing::TypedPath + specta::Type + 'static + OperationInput,
         F: FnOnce(TransformOperation<'_>) -> TransformOperation<'_>,
     {
         self.api_route(
@@ -293,11 +292,11 @@ where
 /// A wrapper around `axum_extra::routing::TypedPath` to implement `OperationInput`.
 /// Basically fix for Rust does not support `!Trait` and specialization on stable.
 #[derive(Debug)]
-pub struct TypedPath<T: axum_extra::routing::TypedPath + TS + 'static>(pub T);
+pub struct TypedPath<T: axum_extra::routing::TypedPath + specta::Type + 'static>(pub T);
 
 impl<T> OperationInput for TypedPath<T>
 where
-    T: axum_extra::routing::TypedPath + TS + 'static,
+    T: axum_extra::routing::TypedPath + specta::Type + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         let params = parameters_from_schema::<T>(ctx, ParamLocation::Path);
@@ -310,7 +309,7 @@ where
 
 impl<T, S> axum::extract::FromRequestParts<S> for TypedPath<T>
 where
-    T: DeserializeOwned + Send + axum_extra::routing::TypedPath + TS + 'static,
+    T: DeserializeOwned + Send + axum_extra::routing::TypedPath + specta::Type + 'static,
     S: Send + Sync,
 {
     type Rejection = PathRejection;
@@ -323,7 +322,7 @@ where
 
 impl<T, S> axum::extract::OptionalFromRequestParts<S> for TypedPath<T>
 where
-    T: DeserializeOwned + Send + 'static + axum_extra::routing::TypedPath + TS + 'static,
+    T: DeserializeOwned + Send + 'static + axum_extra::routing::TypedPath + specta::Type + 'static,
     S: Send + Sync,
 {
     type Rejection = PathRejection;

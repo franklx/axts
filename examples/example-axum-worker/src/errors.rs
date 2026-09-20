@@ -1,11 +1,10 @@
 use axum::{http::StatusCode, response::IntoResponse};
-use ts_rs::TS;
 use serde::Serialize;
 use serde_json::Value;
 use uuid::Uuid;
 
 /// A default error response for most API errors.
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, specta::Type)]
 pub struct AppError {
     /// An error message.
     pub error: String,

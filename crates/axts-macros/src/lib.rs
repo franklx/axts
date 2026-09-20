@@ -92,7 +92,7 @@ pub fn derive_operation_io(ts: TokenStream) -> TokenStream {
 
         for param in generic_params {
             wh.predicates
-                .push(parse_quote!(#param: ts_rs::TS));
+                .push(parse_quote!(#param: specta::Type));
         }
     }
 
@@ -191,7 +191,7 @@ pub fn axum_typed_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
         #[derive(
             ::axum_extra::routing::TypedPath,
             ::axts_macros::OperationIo,
-            ::ts_rs::TS,
+            ::specta::Type,
             ::serde::Deserialize,
         )]
         #[axts(input_with = "axts::axum::routing::typed::TypedPath<Self>")]

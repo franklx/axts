@@ -49,11 +49,10 @@
 //! use axts::NoApi;
 //! use axum::{Extension, Json};
 //! use serde::Deserialize;
-//! use ts_rs::TS;
 //!
-//! // We'll need to derive `TS` for
+//! // We'll need to derive `specta::Type` for
 //! // all types that appear in the api documentation.
-//! #[derive(Deserialize, TS)]
+//! #[derive(Deserialize, specta::Type)]
 //! struct User {
 //!     name: String,
 //! }
@@ -63,7 +62,7 @@
 //! }
 //!
 //! // `OpenApi` itself is just bookkeeping for the routes/types that
-//! // were registered, it does not need to derive `TS`. Wrapping the
+//! // were registered, it does not need to derive `specta::Type`. Wrapping the
 //! // response in `NoApi` lets us return it without that requirement.
 //! async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
 //!     NoApi(Json(api))
@@ -878,9 +877,8 @@ mod tests {
         use crate::{generate, openapi::Operation, OperationInput};
         use axum::Json;
         use serde::Deserialize;
-        use ts_rs::TS;
 
-        #[derive(Deserialize, TS)]
+        #[derive(Deserialize, specta::Type)]
         struct Example {
             value: usize,
         }

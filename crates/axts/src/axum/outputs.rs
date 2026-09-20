@@ -8,8 +8,6 @@ use axum::extract::rejection::FormRejection;
 use axum::extract::rejection::JsonRejection;
 use axum::response::{Html, NoContent, Redirect};
 use indexmap::IndexMap;
-#[cfg(any(feature = "axum-form", feature = "axum-json"))]
-use ts_rs::TS;
 
 use crate::{generate::GenContext, operation::OperationOutput};
 
@@ -31,7 +29,7 @@ impl OperationOutput for NoContent {
 #[cfg(feature = "axum-json")]
 impl<T> OperationOutput for axum::Json<T>
 where
-    T: TS + 'static,
+    T: specta::Type + 'static,
 {
     type Inner = T;
 
@@ -76,7 +74,7 @@ where
 #[cfg(feature = "axum-form")]
 impl<T> OperationOutput for axum::extract::Form<T>
 where
-    T: TS + 'static,
+    T: specta::Type + 'static,
 {
     type Inner = T;
 

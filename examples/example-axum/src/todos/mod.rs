@@ -1,11 +1,10 @@
 use serde::{Deserialize, Serialize};
-use ts_rs::TS;
 use uuid::Uuid;
 
 pub mod routes;
 
 /// A single Todo item.
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
 pub struct TodoItem {
     pub id: Uuid,
     /// The description of the item.

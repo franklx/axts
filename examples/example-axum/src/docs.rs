@@ -73,7 +73,7 @@ async fn serve_index() -> impl IntoApiResponse {
 /// A JSON manifest of the routes known to `axts`, including the name of
 /// the TypeScript type used for each parameter/request body/response.
 ///
-/// `OpenApi` is just bookkeeping and does not derive `TS` itself, so we
+/// `OpenApi` is just bookkeeping and does not derive `specta::Type` itself, so we
 /// wrap the response in [`NoApi`] to serve it without needing to
 /// document its own shape.
 async fn serve_api_manifest(Extension(api): Extension<Arc<OpenApi>>) -> impl IntoApiResponse {

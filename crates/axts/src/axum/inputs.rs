@@ -13,7 +13,6 @@ use axum::{
 
 use indexmap::IndexMap;
 use serde_json::json;
-use ts_rs::TS;
 
 use crate::{
     error::Error,
@@ -64,7 +63,7 @@ where
 }
 
 #[cfg(any(feature = "axum-json", feature = "axum-extra-json-deserializer"))]
-fn operation_input_json<T: TS + 'static>(
+fn operation_input_json<T: specta::Type + 'static>(
     ctx: &mut crate::generate::GenContext,
     operation: &mut Operation,
 ) {
@@ -124,7 +123,7 @@ fn inferred_early_responses_json() -> Vec<(Option<StatusCode>, Response)> {
 #[cfg(feature = "axum-json")]
 impl<T> OperationInput for axum::Json<T>
 where
-    T: TS + 'static,
+    T: specta::Type + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         operation_input_json::<T>(ctx, operation);
@@ -141,7 +140,7 @@ where
 #[cfg(feature = "axum-extra-json-deserializer")]
 impl<T> OperationInput for axum_extra::extract::JsonDeserializer<T>
 where
-    T: TS + 'static,
+    T: specta::Type + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         operation_input_json::<T>(ctx, operation);
@@ -158,7 +157,7 @@ where
 #[cfg(feature = "axum-form")]
 impl<T> OperationInput for axum::extract::Form<T>
 where
-    T: TS + 'static,
+    T: specta::Type + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         let schema_obj = ctx.register_type::<T>();
@@ -185,7 +184,7 @@ where
 
 impl<T> OperationInput for Path<T>
 where
-    T: TS + 'static,
+    T: specta::Type + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         let params = parameters_from_schema::<T>(ctx, ParamLocation::Path);
@@ -196,7 +195,7 @@ where
 #[cfg(feature = "axum-query")]
 impl<T> OperationInput for axum::extract::Query<T>
 where
-    T: TS + 'static,
+    T: specta::Type + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         let params = parameters_from_schema::<T>(ctx, ParamLocation::Query);
@@ -349,7 +348,7 @@ impl OperationInput for axum_extra::extract::PrivateCookieJar {}
 #[cfg(feature = "axum-extra-form")]
 impl<T> OperationInput for axum_extra::extract::Form<T>
 where
-    T: TS + 'static,
+    T: specta::Type + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         let schema_obj = ctx.register_type::<T>();
@@ -376,7 +375,7 @@ where
 #[cfg(feature = "axum-extra-query")]
 impl<T> OperationInput for axum_extra::extract::Query<T>
 where
-    T: TS + 'static,
+    T: specta::Type + 'static,
 {
     fn operation_input(ctx: &mut crate::generate::GenContext, operation: &mut Operation) {
         let params = parameters_from_schema::<T>(ctx, ParamLocation::Query);

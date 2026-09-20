@@ -1,7 +1,6 @@
 //! Traits and utilities for schema generation for operations (handlers).
 
 use indexmap::IndexMap;
-use ts_rs::TS;
 
 use crate::generate::GenContext;
 use crate::openapi::{
@@ -209,7 +208,7 @@ pub enum ParamLocation {
 #[tracing::instrument(skip_all)]
 pub fn parameters_from_schema<T>(ctx: &mut GenContext, location: ParamLocation) -> Vec<Parameter>
 where
-    T: TS + 'static + ?Sized,
+    T: specta::Type + 'static + ?Sized,
 {
     let schema_obj = ctx.register_type::<T>();
     let name = match location {
@@ -290,7 +289,6 @@ mod tests {
     use crate::openapi::{Operation, Response, StatusCode};
     use crate::{generate, OperationInput, OperationOutput};
     use axts_macros::OperationIo;
-    use ts_rs::TS;
 
     fn assert_default_input_impl<T: OperationInput>(ctx: &mut GenContext) {
         let mut operation = Operation::default();
@@ -425,8 +423,8 @@ mod tests {
         struct OperationInputOutput<T, U>(T, U);
 
         struct OperationInputOutputIfJsonSchema<T, U>(T, U);
-        impl<T: TS, U: TS> OperationInput for OperationInputOutputIfJsonSchema<T, U> {}
-        impl<T: TS, U: TS> OperationOutput for OperationInputOutputIfJsonSchema<T, U> {
+        impl<T: specta::Type, U: specta::Type> OperationInput for OperationInputOutputIfJsonSchema<T, U> {}
+        impl<T: specta::Type, U: specta::Type> OperationOutput for OperationInputOutputIfJsonSchema<T, U> {
             type Inner = Self;
         }
 

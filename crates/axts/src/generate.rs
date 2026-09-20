@@ -5,8 +5,11 @@ use std::cell::RefCell;
 use std::path::Path;
 
 use indexmap::IndexMap;
-use ts_rs::TS;
+use specta::datatype::{DataType, DefOpts, TypeDefs};
+use specta::ts::ExportConfiguration;
+use specta::r#type::NamedType;
 
+use crate::IntoApi;
 use crate::error::Error;
 use crate::openapi::SchemaObject;
 
@@ -98,14 +101,14 @@ pub fn reset_context() {
 #[derive(Clone)]
 struct RegisteredType {
     name: String,
-    export: fn(&ts_rs::Config) -> Result<(), ts_rs::ExportError>,
+    export: fn(&specta::ts::ExportConfiguration) -> Result<(), specta::ts::TsExportError>,
 }
 
 /// A context for documentation generation that provides settings
 /// and a registry of TypeScript types generated via `ts-rs`.
 pub struct GenContext {
     /// Configuration used when generating and exporting TypeScript types.
-    pub ts_config: ts_rs::Config,
+    pub ts_config: specta::ts::ExportConfiguration,
 
     pub(crate) infer_responses: bool,
 
@@ -123,6 +126,7 @@ pub struct GenContext {
     /// when possible.
     pub(crate) show_error: fn(&Error) -> bool,
     error_handler: Option<Box<dyn Fn(Error)>>,
+    type_map: TypeDefs,
 }
 
 impl GenContext {
@@ -136,13 +140,14 @@ impl GenContext {
         }
 
         Self {
-            ts_config: ts_rs::Config::new(),
+            ts_config: specta::ts::ExportConfiguration::new().bigint(specta::ts::BigIntExportBehavior::BigInt),
             infer_responses: true,
             all_error_responses: false,
             show_error: default_error_filter,
             error_handler: None,
             no_content_status,
             types: IndexMap::new(),
+            type_map: TypeDefs::default(),
         }
     }
 
@@ -168,10 +173,30 @@ impl GenContext {
     /// The type is only exported once even if registered multiple times.
     pub fn register_type<T>(&mut self) -> SchemaObject
     where
-        T: TS + 'static + ?Sized,
+        T: specta::Type + 'static + ?Sized,
     {
-        let name = T::name(&self.ts_config);
+        fn fix_named(ts_config: &ExportConfiguration, data_type: &DataType) -> String {
+            // TODO: use forked "specta" return named if Named [src/lang/ts/mod.rs@datatype_inner]
+            match data_type {
+                DataType::Named(named) => named.name.to_string(),
+                DataType::List(inner) => format!("{}[]", fix_named(ts_config, inner)),
+                DataType::Nullable(nullable) => format!("{}|null", fix_named(ts_config, nullable)),
+                DataType::Object(object) => object.fields.iter().map(|f| fix_named(ts_config, f)),
 
+                | DataType::Any
+                | DataType::Primitive(_)
+                | DataType::Literal(_)
+                | DataType::Record(_)
+                    => specta::ts::datatype(ts_config, data_type).unwrap(),
+                DataType::Enum(enum_type) => todo!(),
+                DataType::Tuple(tuple_type) => todo!(),
+                DataType::Reference(data_type_reference) => todo!(),
+                DataType::Generic(generic_type) => todo!(),
+            }
+        }
+        let data_type = T::definition(DefOpts { parent_inline: false, type_map:  &mut self.type_map }).unwrap();
+        let name = fix_named(&self.ts_config, &data_type);
+        /*
         self.types
             .entry(TypeId::of::<T>())
             .or_insert_with(|| RegisteredType {
@@ -184,23 +209,35 @@ impl GenContext {
             description: T::docs(),
             example: None,
         }
+        */
+        SchemaObject {
+            ts_type: name,
+            ..Default::default()
+        }
     }
 
     /// Export all types registered so far to the given directory.
     pub fn export_types(&self, out_dir: impl AsRef<Path>) -> Result<(), Error> {
-        let cfg = ts_rs::Config::new().with_out_dir(out_dir.as_ref());
+        specta::export::ts_with_cfg(&out_dir.as_ref().to_string_lossy(), &self.ts_config).unwrap();
+        /*
+        let cfg = specta::ts::ExportConfiguration::new().with_out_dir(out_dir.as_ref());
 
         for registered in self.types.values() {
+            let name = registered.name.as_str();
+            if name.starts_with("Array") || name.contains('|') || name.starts_with('[') || name.starts_with('{') || ["string", "number", "boolean", "null", "undefined", "void", "unknown", "any", "never", "object", "bigint", "Array", "Record", "Promise", "Date"].contains(&name) {
+                continue
+            }
             (registered.export)(&cfg)
                 .map_err(|e| Error::Other(Box::new(TsExportError(registered.name.clone(), e))))?;
         }
+        */
 
         Ok(())
     }
 }
 
 #[derive(Debug)]
-struct TsExportError(String, ts_rs::ExportError);
+struct TsExportError(String, specta::ts::TsExportError);
 
 impl std::fmt::Display for TsExportError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

@@ -1,6 +1,7 @@
 //! Crate-wide error types.
 
 use crate::openapi::StatusCode;
+use specta::ts::TsExportError;
 use thiserror::Error;
 
 /// Errors during documentation generation.
@@ -33,6 +34,8 @@ pub enum Error {
     InferredResponseConflict(String),
     #[error("did not apply inferred default response because a default response already exists")]
     InferredDefaultResponseConflict,
+    #[error(transparent)]
+    ExportError(#[from] TsExportError),
     #[error("{0}")]
     Other(Box<dyn std::error::Error + Send>),
 }

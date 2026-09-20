@@ -306,7 +306,7 @@ fn preferred_schema<'a>(
     content: impl Iterator<Item = (&'a String, &'a crate::openapi::MediaType)>,
 ) -> Option<SchemaObject> {
     let mut entries: Vec<_> = content.collect();
-    entries.sort_by_key(|(k, _)| if k.as_str() == "application/json" { 0 } else { 1 });
+    entries.sort_by_key(|(k, _)| i32::from(k.as_str() != "application/json"));
     entries.into_iter().find_map(|(_, mt)| mt.schema.clone())
 }
 
