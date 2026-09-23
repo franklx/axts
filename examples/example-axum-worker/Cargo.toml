@@ -16,7 +16,7 @@ tower-service = "0.3"
 worker = { version = "0.8", features = ["http", "axum"] }
 console_error_panic_hook = "0.1"
 axum = { version = "0.8", default-features = false, features = ["macros", "form", "matched-path", "query", "original-uri"] }
-specta = { version = "1", features = ["uuid", "serde"] }
+specta = { path = "/home/franco/Projects/FORKS/rust/specta", version = "1", features = ["uuid", "serde"] }
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"
 uuid = { version = "1", features = ["serde", "v4"] }

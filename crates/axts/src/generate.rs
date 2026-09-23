@@ -7,7 +7,7 @@ use std::path::Path;
 use indexmap::IndexMap;
 use specta::datatype::{DataType, DefOpts, TypeDefs};
 use specta::ts::ExportConfiguration;
-use specta::r#type::NamedType;
+use specta::r#type::{NamedType, TypeCategory};
 
 use crate::IntoApi;
 use crate::error::Error;
@@ -175,27 +175,11 @@ impl GenContext {
     where
         T: specta::Type + 'static + ?Sized,
     {
-        fn fix_named(ts_config: &ExportConfiguration, data_type: &DataType) -> String {
-            // TODO: use forked "specta" return named if Named [src/lang/ts/mod.rs@datatype_inner]
-            match data_type {
-                DataType::Named(named) => named.name.to_string(),
-                DataType::List(inner) => format!("{}[]", fix_named(ts_config, inner)),
-                DataType::Nullable(nullable) => format!("{}|null", fix_named(ts_config, nullable)),
-                DataType::Object(object) => object.fields.iter().map(|f| fix_named(ts_config, f)),
-
-                | DataType::Any
-                | DataType::Primitive(_)
-                | DataType::Literal(_)
-                | DataType::Record(_)
-                    => specta::ts::datatype(ts_config, data_type).unwrap(),
-                DataType::Enum(enum_type) => todo!(),
-                DataType::Tuple(tuple_type) => todo!(),
-                DataType::Reference(data_type_reference) => todo!(),
-                DataType::Generic(generic_type) => todo!(),
-            }
-        }
-        let data_type = T::definition(DefOpts { parent_inline: false, type_map:  &mut self.type_map }).unwrap();
-        let name = fix_named(&self.ts_config, &data_type);
+        let category = T::category_impl(DefOpts { parent_inline: false, type_map: &mut self.type_map }, &[]).unwrap();
+        let name = match category {
+            TypeCategory::Inline(data_type) => specta::ts::datatype_inlined(&self.ts_config, &data_type).unwrap(),
+            TypeCategory::Reference(data_type_reference) => data_type_reference.name.to_owned(),
+        };
         /*
         self.types
             .entry(TypeId::of::<T>())
@@ -203,12 +187,6 @@ impl GenContext {
                 name: name.clone(),
                 export: T::export_all,
             });
-
-        SchemaObject {
-            ts_type: name,
-            description: T::docs(),
-            example: None,
-        }
         */
         SchemaObject {
             ts_type: name,
