@@ -5,11 +5,9 @@ use std::cell::RefCell;
 use std::path::Path;
 
 use indexmap::IndexMap;
-use specta::datatype::{DataType, DefOpts, TypeDefs};
-use specta::ts::ExportConfiguration;
-use specta::r#type::{NamedType, TypeCategory};
+use specta::datatype::{DefOpts, TypeDefs};
+use specta::r#type::TypeCategory;
 
-use crate::IntoApi;
 use crate::error::Error;
 use crate::openapi::SchemaObject;
 
@@ -140,7 +138,7 @@ impl GenContext {
         }
 
         Self {
-            ts_config: specta::ts::ExportConfiguration::new().bigint(specta::ts::BigIntExportBehavior::BigInt),
+            ts_config: specta::ts::ExportConfiguration::new().bigint(specta::ts::BigIntExportBehavior::Number),
             infer_responses: true,
             all_error_responses: false,
             show_error: default_error_filter,

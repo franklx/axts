@@ -38,17 +38,17 @@ async fn main() {
     // Instead of an Open API document, axts now generates TypeScript
     // types (via `ts-rs`) and a typed `fetch` client for the routes
     // above.
-    if let Err(err) = axts::generate::export_types("bindings") {
+    if let Err(err) = axts::generate::export_types("client/_/api") {
         eprintln!("failed to export TypeScript types: {err}");
     } else {
-        println!("TypeScript types written to ./bindings");
+        println!("TypeScript types written to ./client/_/api");
     }
 
     let client = axts::typescript::to_client(&api, &Default::default());
-    if let Err(err) = std::fs::write("bindings/client.ts", client) {
+    if let Err(err) = std::fs::write("client/_/api/index.ts", client) {
         eprintln!("failed to write generated TypeScript client: {err}");
     } else {
-        println!("TypeScript client written to ./bindings/client.ts");
+        println!("TypeScript client written to ./client/_/api/index.ts");
     }
 
     println!("Example docs are accessible at http://127.0.0.1:3000/docs");

@@ -57,7 +57,7 @@ async fn serve_index() -> impl IntoApiResponse {
     <p>
       This example generates TypeScript instead of an Open API UI.
       TypeScript type declarations for every type used by this API are
-      written to the <code>bindings/</code> directory on startup (see
+      written to the <code>client/_/api/</code> directory on startup (see
       the server logs), and a typed <code>fetch</code> client is
       available below.
     </p>
@@ -81,7 +81,7 @@ async fn serve_api_manifest(Extension(api): Extension<Arc<OpenApi>>) -> impl Int
 }
 
 /// Serves the same generated TypeScript client that is written to
-/// `bindings/client.ts` on startup.
+/// `client/_/api/index.ts` on startup.
 async fn serve_client(Extension(api): Extension<Arc<OpenApi>>) -> impl IntoApiResponse {
     axts::typescript::to_client(&api, &Default::default())
 }

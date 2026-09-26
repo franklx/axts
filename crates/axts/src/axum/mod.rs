@@ -90,10 +90,10 @@
 //!     let app = app.finish_api(&mut api);
 //!
 //!     // Write the `User.ts` (and friends) type declarations to disk...
-//!     axts::generate::export_types("bindings").unwrap();
+//!     axts::generate::export_types("client/_/api/").unwrap();
 //!     // ...and generate a typed `fetch` client for the routes above.
 //!     let client = axts::typescript::to_client(&api, &Default::default());
-//!     std::fs::write("bindings/client.ts", client).unwrap();
+//!     std::fs::write("client/_/api/index.ts", client).unwrap();
 //!
 //!     axum::serve(
 //!         listener,
