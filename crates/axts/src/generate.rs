@@ -78,8 +78,8 @@ pub fn all_error_responses(infer: bool) {
 ///
 /// Each type is written to its own `.ts` file, `ts-rs` takes care of
 /// generating the necessary `import` statements between them.
-pub fn export_types(out_dir: impl AsRef<Path>) -> Result<(), Error> {
-    in_context(|ctx| ctx.export_types(out_dir))
+pub fn export_types(out_dir: impl AsRef<Path>, with_defaults: bool) -> Result<(), Error> {
+    in_context(|ctx| ctx.export_types(out_dir, with_defaults))
 }
 
 /// Reset the state of the thread-local context.
@@ -193,21 +193,8 @@ impl GenContext {
     }
 
     /// Export all types registered so far to the given directory.
-    pub fn export_types(&self, out_dir: impl AsRef<Path>) -> Result<(), Error> {
-        specta::export::ts_with_cfg(&out_dir.as_ref().to_string_lossy(), &self.ts_config).unwrap();
-        /*
-        let cfg = specta::ts::ExportConfiguration::new().with_out_dir(out_dir.as_ref());
-
-        for registered in self.types.values() {
-            let name = registered.name.as_str();
-            if name.starts_with("Array") || name.contains('|') || name.starts_with('[') || name.starts_with('{') || ["string", "number", "boolean", "null", "undefined", "void", "unknown", "any", "never", "object", "bigint", "Array", "Record", "Promise", "Date"].contains(&name) {
-                continue
-            }
-            (registered.export)(&cfg)
-                .map_err(|e| Error::Other(Box::new(TsExportError(registered.name.clone(), e))))?;
-        }
-        */
-
+    pub fn export_types(&self, out_dir: impl AsRef<Path>, with_defaults: bool) -> Result<(), Error> {
+        specta::export::ts_with_cfg(&out_dir.as_ref().to_string_lossy(), &self.ts_config, with_defaults).unwrap();
         Ok(())
     }
 }
