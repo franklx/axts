@@ -10,7 +10,7 @@ axts = { path = "../../crates/axts", features = [
     "macros",
 ] }
 axum = { version = "0.8", features = ["macros"] }
-specta = { path = "/home/franco/Projects/FORKS/rust/specta", version = "1", features = ["uuid", "serde"] }
+specta = { registry = "elleci", version = "1", features = ["uuid", "serde"] }
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

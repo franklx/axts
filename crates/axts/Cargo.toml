@@ -1,6 +1,6 @@
 [package]
 name = "axts"
-version = "0.16.0"
+version = "1.0.0"
 authors = ["franklx"]
 edition = "2024"
 keywords = ["generate", "api", "openapi", "documentation", "specification"]
@@ -14,12 +14,12 @@ publish = ["elleci"]
 [dependencies]
 indexmap = { version = "2", features = ["serde"] }
 itertools = "0.15"
-specta = { path = "/home/franco/Projects/FORKS/rust/specta", version = "1", features = ["export"] }
+specta = { registry = "elleci", version = "1", features = ["export"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
 tracing = "0.1"
-axts-macros = { registry = "elleci", version = "~0.16.0", path = "../axts-macros", optional = true }
+axts-macros = { registry = "elleci", version = "~1", path = "../axts-macros", optional = true }
 
 bytes = { version = "1", optional = true }
 http = { version = "1", optional = true }
