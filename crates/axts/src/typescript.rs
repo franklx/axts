@@ -154,6 +154,7 @@ fn render_operation(
 
     let return_ty = match response_schema {
         Some(_) if response_ctype.starts_with("application/") && !response_ctype.contains("json") => "Blob | File",
+        Some(_) if response_ctype.starts_with("text/") && !response_ctype.contains("html") => "Blob | File",
         Some(s) => s.ts_type.as_str(),
         None => "void"
     };
@@ -237,7 +238,7 @@ fn is_success(code: &StatusCode) -> bool {
 const TS_BUILTINS: &[&str] = &[
     "string", "number", "boolean", "null", "undefined", "void", "unknown", "any", "never",
     "object", "bigint", "Array", "Record", "Partial", "Required", "Readonly", "Pick", "Omit",
-    "Promise", "Date",
+    "Promise", "Date", "FormData",
 ];
 
 /// Extract identifier-like tokens from a (possibly generic) TypeScript

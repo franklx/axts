@@ -38,7 +38,7 @@ async fn main() {
     // Instead of an Open API document, axts now generates TypeScript
     // types (via `ts-rs`) and a typed `fetch` client for the routes
     // above.
-    if let Err(err) = axts::generate::export_types("client/_/api") {
+    if let Err(err) = axts::generate::export_types("client/_/api", true) {
         eprintln!("failed to export TypeScript types: {err}");
     } else {
         println!("TypeScript types written to ./client/_/api");

@@ -1,6 +1,6 @@
 [package]
 name = "axts"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["franklx"]
 edition = "2024"
 keywords = ["generate", "api", "openapi", "documentation", "specification"]

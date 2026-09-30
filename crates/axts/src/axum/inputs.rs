@@ -302,7 +302,7 @@ impl OperationInput for axum::extract::Multipart {
                 content: IndexMap::from_iter([(
                     "multipart/form-data".into(),
                     MediaType {
-                        schema: Some(SchemaObject::literal("unknown[]")),
+                        schema: Some(SchemaObject::literal("FormData | any[] | Record<string, unknown>")),
                         ..Default::default()
                     },
                 )]),
